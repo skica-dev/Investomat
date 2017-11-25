@@ -1,5 +1,5 @@
 """
-reusable module to interact with BitBay.net
+interacting with BitBay.net
 """
 import hashlib
 import hmac
