@@ -1,5 +1,6 @@
 """
-Kasomat by m4k5
+Investomat by m4k5
+personal automatic investor
 """
 try:
     import hashlib
@@ -10,37 +11,15 @@ try:
 except ImportError:
     print 'Missing dependencies, please check requirments.'
     exit()
-import imejl
-
-# please set up everything using sth.py
-with open('data') as data:
-    settings = data.readlines()
-api_key = settings[0]
-api_secret = settings[1]
-address = settings[2]
-
-
-def btc_price():
-    return float(requests.get(
-        'https://bitbay.net/API/Public/BTCPLN/ticker.json').json()['average'])
-
-
-def get_add_bal(addr):
-    return float(requests.get(
-        'https://blockchain.info/q/addressbalance/' + addr).json()) / 10 ** 8
-
-
-def info_bb(c=True):
-    data = {'method': 'info', 'moment': str(int(time.time()))}
-    tosign = '&'.join([i + '=' + data[i] for i in data])
-    sign = hmac.new(api_secret, tosign, hashlib.sha512)
-    resp = requests.post(
-        'https://bitbay.net/API/Trading/tradingApi.php',
-        data, headers={'API-Key': api_key, 'API-Hash': sign.hexdigest()}).json()
-    if c:
-        return resp['balances']
-    else:
-        return resp
+import notify
+try:
+    with open('data') as data:
+        settings = data.readlines()
+        api_key = settings[0]
+        api_secret = settings[1]
+        address = settings[2]
+except:
+    print "TODO"
 
 
 def count_wd(d0, d1, wd=4, f=0):
