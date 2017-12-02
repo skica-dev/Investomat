@@ -1,6 +1,8 @@
 """
 Investomat by m4k5
 24/7 personal automatic investor powered with Python
+Currently supports:
+- Bitcoin (exchanges listed in bitcoin.py)
 """
 try:
     import hashlib
@@ -27,9 +29,11 @@ except (IOError, IndexError):
 exchange = bitcoin.BitBay_net(api_public, api_secret)
 exchange_balances = exchange.getBalance()
 exchange_price = exchange.btcPrice()
+bitcoin_balance = bitcoin.getAddressBalance(address)
 result = ''
 for i in exchange_balances:
-    if (exchange_balances[i]['available'] != '0' or exchange_balances[i]['locked'] != '0'):
+    if (exchange_balances[i]['available'] != '0' or
+            exchange_balances[i]['locked'] != '0'):
         if i != 'PLN':
             result += 'Available for {}: {} {}\n'.format(
                 i, exchange_balances[i]['available'], i)
@@ -40,8 +44,7 @@ for i in exchange_balances:
                 i, round(float(exchange_balances[i]['available']), 2), i)
             result += 'Locked for {}: {} {}\n\n'.format(
                 i, round(float(exchange_balances[i]['locked']), 2), i)
-bitcoin_balance = bitcoin.getAddressBalance(address)
-result += 'Address balance is {!s} (~{!s} PLN)\n'.format(
+result += 'Address balance is {!s} BTC (~{!s} PLN)\n'.format(
     bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
 print result
 
