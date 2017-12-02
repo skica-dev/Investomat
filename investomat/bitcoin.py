@@ -25,13 +25,13 @@ class BitBay_net(object):
         self.api_public = str(api_public)
         self.api_secret = str(api_secret)
 
-    def btcPrice(type='average', crypto='BTC'):
+    def btcPrice(self, mode='average', crypto='BTC'):
         """
         fetching actual crypto prices
         types available: average, bid, ask
         """
         return float(requests.get('https://bitbay.net/API/Public/' + crypto
-                                  + 'PLN/ticker.json').json()[type])
+                                  + 'PLN/ticker.json').json()[mode])
 
     def buyCrypto(self, amount, rate, crypto='BTC'):
         """
