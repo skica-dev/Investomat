@@ -1,6 +1,6 @@
 """
 Investomat by m4k5
-personal automatic investor
+24/7 personal automatic investor powered with Python
 """
 try:
     import hashlib
@@ -19,8 +19,9 @@ try:
         api_public = settings[0]
         api_secret = settings[1]
         address = settings[2]
-except:
+except (IOError, IndexError):
     print "CONFIGURE.PY"
+    exit()
 
 
 exchange = bitcoin.BitBay_net(api_public, api_secret)
@@ -37,4 +38,3 @@ def count_wd(d0, d1, wd=4, f=0):
         if d0.weekday() == 0:
             f += 1
     return f
-# print imejl.send_email('Kasomat %s' % datetime.date(), 'maks1823@protonmail.com', 'akt')
