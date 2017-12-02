@@ -45,10 +45,11 @@ result += 'Address balance is {!s} (~{!s} PLN)\n'.format(
     bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
 print result
 
-
+"""
 def count_wd(d0, d1, wd=4, f=0):
     while d0 != d1:
         d0 += datetime.timedelta(1)
         if d0.weekday() == 0:
             f += 1
     return f
+"""
