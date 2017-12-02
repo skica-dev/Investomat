@@ -1,5 +1,10 @@
 """
 notyfing user
+Currently supports:
+- sending email
+TODO:
+- pushbullet
+- SMS
 """
 import smtplib
 from email.mime.text import MIMEText
