@@ -6,18 +6,23 @@ TODO:
 - pushbullet
 - SMS
 """
+
 import smtplib
 from email.mime.text import MIMEText
 
 
-def send_email(subject, receipent, content, login, password, server, sender):
+def send_email(subject, receipent, content, login, password, server):
     """
     email sending
     """
-    mail = 'From: %s\nSubject: %s\n%s' % (sender, subject, content)
-    s = smtplib.SMTP(host=server, port=587)
-    s.starttls()
-    s.login(login, password)
-    s.sendmail(sender, receipent, mail)
-    s.quit()
+    try:
+        mail = 'From: %s\nSubject: %s\n%s' % (login, subject, content)
+        s = smtplib.SMTP(host=server, port=587)
+        s.starttls()
+        s.login(login, password)
+        s.sendmail(login, receipent, mail)
+        s.quit()
+    except:
+        raise SendingEmailFailed
+
     return True
