@@ -21,11 +21,15 @@ try:
         api_public = settings[0]
         api_secret = settings[1]
         address = settings[2]
+        amount = settings[3]
+        user = settings[4]
+        password = settings[5]
+        server = settings[6]
+        port = settings[7]
+        receipent = settings[8]
 except (IOError, IndexError):
     print 'CONFIGURE.PY'
     exit()
-
-
 exchange = bitcoin.BitBay_net(api_public, api_secret)
 exchange_balances = exchange.getBalance()
 exchange_price = exchange.btcPrice()
@@ -47,7 +51,7 @@ for i in exchange_balances:
 result += 'Address balance is {!s} BTC (~{!s} PLN)\n'.format(
     bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
 print result
-
+notify.send_email('Report Investomat', , result, user, password)
 """
 def count_wd(d0, d1, wd=4, f=0):
     while d0 != d1:
