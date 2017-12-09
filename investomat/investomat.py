@@ -32,7 +32,7 @@ except (IOError, IndexError):
     exit()
 exchange = bitcoin.BitBay_net(api_public, api_secret)
 exchange_balances = exchange.getBalance()
-exchange_price = exchange.btcPrice()
+exchange_price = exchange.btcPrice(mode='bid')
 bitcoin_balance = bitcoin.getAddressBalance(address)
 result = ''
 for i in exchange_balances:
@@ -50,8 +50,10 @@ for i in exchange_balances:
                 i, round(float(exchange_balances[i]['locked']), 2), i)
 result += 'Address balance is {!s} BTC (~{!s} PLN)\n'.format(
     bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
+print exchange.buyCrypto(round(7 / exchange_price, 8), exchange_price)
 print result
-notify.send_email('Report Investomat', , result, user, password)
+notify.send_email('Report Investomat', receipent, result, user, password,
+                  server, port)
 """
 def count_wd(d0, d1, wd=4, f=0):
     while d0 != d1:
