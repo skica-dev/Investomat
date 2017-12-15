@@ -14,8 +14,11 @@ import time
 
 
 def getAddressBalance(address):
-    return float(requests.get(
-        'https://blockchain.info/q/addressbalance/' + address).json()) / 10 ** 8
+    try:
+        return float(requests.get(
+            'https://blockchain.info/q/addressbalance/' + address).json()) / 10 ** 8
+    except ValueError:
+        raise "AddressBalanceError"
 
 
 class BitBay_net(object):

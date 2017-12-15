@@ -32,7 +32,7 @@ except (IOError, IndexError, TypeError):
     exit()
 exchange = bitcoin.BitBay_net(api_public, api_secret)
 exchange_balances = exchange.getBalance()
-exchange_price = exchange.btcPrice(mode='bid')
+exchange_price = exchange.btcPrice()
 bitcoin_balance = bitcoin.getAddressBalance(address)
 result = ''
 for i in exchange_balances:
@@ -52,7 +52,7 @@ result += 'Address balance is {!s} BTC (~{!s} PLN)\n\n'.format(
     bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
 buy_data = exchange.buyCrypto(
     round(float(amount) / exchange_price, 8), exchange_price)
-result += 'Bought {} BTC @ {} for {!s} PLN'.format(
+result += 'Bought {:.8f} BTC @ {} for {!s} PLN'.format(
     buy_data['amount'], buy_data['rate'], round(float(buy_data['price'])), 2)
 print result
 notify.send_email('Report Investomat', receipent, result, user, password,

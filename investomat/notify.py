@@ -23,6 +23,6 @@ def send_email(subject, receipent, content, login, password, server, port=587):
         s.sendmail(login, receipent, mail)
         s.quit()
     except:
-        raise SendingEmailFailed
+        raise "SendingEmailFailed"
 
     return True
