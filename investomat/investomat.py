@@ -27,7 +27,7 @@ try:
         server = settings[6]
         port = settings[7]
         receipent = settings[8]
-except (IOError, IndexError):
+except (IOError, IndexError, TypeError):
     print 'CONFIGURE.PY'
     exit()
 exchange = bitcoin.BitBay_net(api_public, api_secret)
@@ -51,8 +51,8 @@ for i in exchange_balances:
 result += 'Address balance is {!s} BTC (~{!s} PLN)\n'.format(
     bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
 buy_data = exchange.buyCrypto(
-    round(5 / exchange_price, 8), exchange_price)
-result += 'Bought {} BTC @ {} for {!s} PLN'.format(
+    round(int(amount) / exchange_price, 8), exchange_price)
+result += 'Bought {!s} BTC @ {} for {!s} PLN'.format(
     buy_data['amount'], buy_data['rate'], round(float(buy_data['price'])), 2)
 print result
 notify.send_email('Report Investomat', receipent, result, user, password,
