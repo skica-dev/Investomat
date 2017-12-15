@@ -57,11 +57,3 @@ result += 'Bought {} BTC @ {} for {!s} PLN'.format(
 print result
 notify.send_email('Report Investomat', receipent, result, user, password,
                   server, port)
-"""
-def count_wd(d0, d1, wd=4, f=0):
-    while d0 != d1:
-        d0 += datetime.timedelta(1)
-        if d0.weekday() == 0:
-            f += 1
-    return f
-"""
