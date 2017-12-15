@@ -48,8 +48,8 @@ for i in exchange_balances:
                 i, round(float(exchange_balances[i]['available']), 2), i)
             result += 'Locked for {}: {} {}\n\n'.format(
                 i, round(float(exchange_balances[i]['locked']), 2), i)
-result += 'Address balance is {!s} BTC (~{!s} PLN)\n'.format(
-    bitcoin_balance, round(bitcoin_balance * 10000, 2))
+result += 'Address balance is {!s} BTC (~{!s} PLN)\n\n'.format(
+    bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
 buy_data = exchange.buyCrypto(
     round(float(amount) / exchange_price, 8), exchange_price)
 result += 'Bought {} BTC @ {} for {!s} PLN'.format(
