@@ -4,19 +4,14 @@ Investomat by m4k5
 Currently supports:
 - Bitcoin (exchanges listed in bitcoin.py)
 """
-try:
-    import hashlib
-    import hmac
-    import requests
-    import time
-    import datetime
-except ImportError:
-    print 'Missing dependencies, please check requirments.'
-    exit()
-import notify
+import os
+
 import bitcoin
+import configure
+import notify
+
 try:
-    with open('data') as data:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'investomat.conf')) as data:
         settings = data.read().splitlines()
         api_public = settings[0]
         api_secret = settings[1]
@@ -28,19 +23,20 @@ try:
         port = settings[7]
         receipent = settings[8]
 except (IOError, IndexError, TypeError):
-    print 'CONFIGURE.PY'
+    configure.make_config('investomat.conf')
     exit()
-exchange = bitcoin.BitBay_net(api_public, api_secret)
-exchange_balances = exchange.getBalance()
-exchange_price = exchange.btcPrice()
-bitcoin_balance = bitcoin.getAddressBalance(address)
+exchange = bitcoin.BitBayNet(api_public, api_secret)
+exchange_balances = exchange.get_balances()
+exchange_price = bitcoin.btc_price()
+bitcoin_balance = bitcoin.get_address_balance(address)
 result = ''
 for i in exchange_balances:
     if (exchange_balances[i]['available'] != '0' or
             exchange_balances[i]['locked'] != '0'):
         if i != 'PLN':
-            result += 'Available for {}: {} {}\n'.format(
-                i, exchange_balances[i]['available'], i)
+            result += 'Available for {}: {} {} (~{} PLN)\n'.format(
+                i, exchange_balances[i]['available'], i,
+                round(float(exchange_balances[i]['available']) * exchange_price, 2))
             result += 'Locked for {}: {} {}\n\n'.format(
                 i, exchange_balances[i]['locked'], i)
         else:
@@ -50,10 +46,10 @@ for i in exchange_balances:
                 i, round(float(exchange_balances[i]['locked']), 2), i)
 result += 'Address balance is {!s} BTC (~{!s} PLN)\n\n'.format(
     bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
-buy_data = exchange.buyCrypto(
+buy_data = exchange.buy_crypto(
     round(float(amount) / exchange_price, 8), exchange_price)
-result += 'Bought {:.8f} BTC @ {} for {!s} PLN'.format(
-    buy_data['amount'], buy_data['rate'], round(float(buy_data['price'])), 2)
-print result
+result += 'Bought {!s} satoshis @ {} for {!s} PLN'.format(
+    int(buy_data['amount'] * 100000000), buy_data['rate'], round(float(buy_data['price'])), 2)
+print(result)
 notify.send_email('Report Investomat', receipent, result, user, password,
                   server, port)

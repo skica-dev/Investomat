@@ -9,11 +9,12 @@ Supported exchanges:
 """
 import hashlib
 import hmac
-import requests
 import time
 
+import requests
 
-def getAddressBalance(address):
+
+def get_address_balance(address):
     try:
         return float(requests.get(
             'https://blockchain.info/q/addressbalance/' + address).json()) / 10 ** 8
@@ -21,22 +22,23 @@ def getAddressBalance(address):
         return 0
 
 
-class BitBay_net(object):
+def btc_price(mode='average', crypto='BTC'):
+    """
+    fetching actual crypto prices
+    types available: average, bid, ask
+    """
+    return float(requests.get('https://bitbay.net/API/Public/' + crypto
+                              + 'PLN/ticker.json').json()[mode])
+
+
+class BitBayNet(object):
     """class for BitBay.net exchange"""
 
     def __init__(self, api_public, api_secret):
         self.api_public = str(api_public)
         self.api_secret = str(api_secret)
 
-    def btcPrice(self, mode='average', crypto='BTC'):
-        """
-        fetching actual crypto prices
-        types available: average, bid, ask
-        """
-        return float(requests.get('https://bitbay.net/API/Public/' + crypto
-                                  + 'PLN/ticker.json').json()[mode])
-
-    def buyCrypto(self, amount, rate, crypto='BTC'):
+    def buy_crypto(self, amount, rate, crypto='BTC'):
         """
         buying cryptocurrencies on BitBay.net throught their API
         """
@@ -50,7 +52,7 @@ class BitBay_net(object):
             headers={'API-Key': self.api_public,
                      'API-Hash': sign.hexdigest()}).json()
 
-    def getBalance(self):
+    def get_balances(self):
         request = {'method': 'info', 'moment': str(int(time.time()))}
         sign = hmac.new(self.api_secret,
                         '&'.join([i + '=' + request[i] for i in request]),
