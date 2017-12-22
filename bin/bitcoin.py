@@ -32,7 +32,7 @@ def crypto_price(mode='average', crypto='BTC'):
 
 
 class BitBayNet(object):
-    """class for BitBay.net exchange"""
+    """class for BitBay.net bitbay"""
 
     def __init__(self, api_public, api_secret):
         self.api_public = str(api_public)
@@ -64,10 +64,11 @@ class BitBayNet(object):
         account_value = 0
         for i in balances:
             formatted_balances[i] = float(balances[i]['available']) + float(balances[i]['locked'])
-            if i == 'PLN' or i == 'EUR' or i == 'USD':
+            if i == 'PLN':
                 formatted_balances[i] = round(formatted_balances[i], 2)
-            else:
+                account_value += formatted_balances[i]
+            elif i != 'USD' and i != 'EUR' and formatted_balances[i] != 0:
                 formatted_balances[i] = round(formatted_balances[i], 8)
                 account_value += formatted_balances[i] * crypto_price('ask', i)
-        formatted_balances['account_value'] = account_value
+        formatted_balances['account_value'] = round(account_value, 2)
         return formatted_balances

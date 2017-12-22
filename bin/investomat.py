@@ -8,7 +8,6 @@ import os
 
 import bitcoin
 import configure
-import notify
 
 try:
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'investomat.conf')) as data:
@@ -25,31 +24,14 @@ try:
 except (IOError, IndexError, TypeError):
     configure.make_config('investomat.conf')
     exit()
-exchange = bitcoin.BitBayNet(api_public, api_secret)
-exchange_balances = exchange.get_balances()
-exchange_price = bitcoin.btc_price()
+historical_records = open('investomat_values.data', 'r').readlines()
+records = open('investomat_values.data', 'w')
+records.writelines(historical_records)
+bitbay = bitcoin.BitBayNet(api_public, api_secret)
+exchange_price = bitcoin.crypto_price()
 bitcoin_balance = bitcoin.get_address_balance(address)
-result = ''
-for i in exchange_balances:
-    if (exchange_balances[i]['available'] != '0' or
-            exchange_balances[i]['locked'] != '0'):
-        if i != 'PLN':
-            result += 'Available for {}: {} {} (~{} PLN)\n'.format(
-                i, exchange_balances[i]['available'], i,
-                round(float(exchange_balances[i]['available']) * exchange_price, 2))
-            result += 'Locked for {}: {} {}\n\n'.format(
-                i, exchange_balances[i]['locked'], i)
-        else:
-            result += 'Available for {}: {} {}\n'.format(
-                i, round(float(exchange_balances[i]['available']), 2), i)
-            result += 'Locked for {}: {} {}\n\n'.format(
-                i, round(float(exchange_balances[i]['locked']), 2), i)
-result += 'Address balance is {!s} BTC (~{!s} PLN)\n\n'.format(
-    bitcoin_balance, round(bitcoin_balance * exchange_price, 2))
-buy_data = exchange.buy_crypto(
+buy_data = bitbay.buy_crypto(
     round(float(amount) / exchange_price, 8), exchange_price)
-result += 'Bought {!s} satoshis @ {} for {!s} PLN'.format(
-    int(buy_data['amount'] * 100000000), buy_data['rate'], round(float(buy_data['price'])), 2)
-print(result)
-notify.send_email('Report Investomat', receipent, result, user, password,
-                  server, port)
+exchange_user_info = bitbay.get_balances()
+print('BitBay: {!s} PLN'.format(exchange_user_info['account_value']))
+records.close()
