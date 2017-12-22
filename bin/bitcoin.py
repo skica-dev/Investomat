@@ -22,9 +22,9 @@ def get_address_balance(address):
         return 0
 
 
-def btc_price(mode='average', crypto='BTC'):
+def crypto_price(mode='average', crypto='BTC'):
     """
-    fetching actual crypto prices
+    fetching actual crypto prices at BitBay.net
     types available: average, bid, ask
     """
     return float(requests.get('https://bitbay.net/API/Public/' + crypto
@@ -56,7 +56,18 @@ class BitBayNet(object):
         request = {'method': 'info', 'moment': str(int(time.time()))}
         sign = hmac.new(bytes(self.api_secret.encode('utf-8')),
                         bytes(('&'.join([i + '=' + request[i] for i in request])).encode('utf-8')), hashlib.sha512)
-        return requests.post(
+        balances = requests.post(
             'https://bitbay.net/API/Trading/tradingApi.php',
             request, headers={'API-Key': self.api_public,
                               'API-Hash': sign.hexdigest()}).json()['balances']
+        formatted_balances = {}
+        account_value = 0
+        for i in balances:
+            formatted_balances[i] = float(balances[i]['available']) + float(balances[i]['locked'])
+            if i == 'PLN' or i == 'EUR' or i == 'USD':
+                formatted_balances[i] = round(formatted_balances[i], 2)
+            else:
+                formatted_balances[i] = round(formatted_balances[i], 8)
+                account_value += formatted_balances[i] * crypto_price('ask', i)
+        formatted_balances['account_value'] = account_value
+        return formatted_balances
