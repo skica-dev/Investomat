@@ -8,6 +8,7 @@ import os
 
 import bitcoin
 import configure
+import gold
 
 try:
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'investomat.conf')) as data:
@@ -21,6 +22,7 @@ try:
         server = settings[6]
         port = settings[7]
         receipent = settings[8]
+        gold_possesions = settings[9:]
 except (IOError, IndexError, TypeError):
     configure.make_config('investomat.conf')
     exit()
@@ -34,4 +36,6 @@ buy_data = bitbay.buy_crypto(
     round(float(amount) / exchange_price, 8), exchange_price)
 exchange_user_info = bitbay.get_balances()
 print('BitBay: {!s} PLN'.format(exchange_user_info['account_value']))
+gold_value = gold.gold_value(gold_possesions)
+print('Gold: {!s} PLN'.format(gold_value))
 records.close()
