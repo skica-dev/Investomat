@@ -1,3 +1,9 @@
+"""
+Gold investments interactions:
+- fetching gold price
+Supported data sources:
+- zlotagotowka.pl
+"""
 import bs4
 import requests
 
@@ -13,4 +19,11 @@ def gold_price(keyword):
     for i in range((len(prices))):
         position = prices[i].getText()
         if keyword in position:
-            return float(position[position[1:].find("\n") + 1:])
+            return float(position[position[1:].find('\n') + 1:])
+
+
+def gold_value(gold_list):
+    value = 0
+    for i in gold_list:
+        value += gold_price(i)
+    return value
