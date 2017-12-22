@@ -1,5 +1,5 @@
 """
-sets up a configuration
+sets up a configuration file for the main module
 """
 
 
