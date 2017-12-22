@@ -45,8 +45,8 @@ class BitBayNet(object):
         request = {'method': 'trade', 'moment': str(int(time.time())),
                    'type': 'buy', 'currency': crypto, 'amount': str(amount),
                    'payment_currency': 'PLN', 'rate': str(rate)}
-        sign = hmac.new(self.api_secret, "&".join(
-            [i + '=' + request[i] for i in request]), hashlib.sha512)
+        sign = hmac.new(bytes(self.api_secret.encode('utf-8')),
+                        bytes("&".join([i + '=' + request[i] for i in request]).encode('utf-8')), hashlib.sha512)
         return requests.post(
             "https://bitbay.net/API/Trading/tradingApi.php", request,
             headers={'API-Key': self.api_public,
@@ -54,9 +54,8 @@ class BitBayNet(object):
 
     def get_balances(self):
         request = {'method': 'info', 'moment': str(int(time.time()))}
-        sign = hmac.new(self.api_secret,
-                        '&'.join([i + '=' + request[i] for i in request]),
-                        hashlib.sha512)
+        sign = hmac.new(bytes(self.api_secret.encode('utf-8')),
+                        bytes(('&'.join([i + '=' + request[i] for i in request])).encode('utf-8')), hashlib.sha512)
         return requests.post(
             'https://bitbay.net/API/Trading/tradingApi.php',
             request, headers={'API-Key': self.api_public,
