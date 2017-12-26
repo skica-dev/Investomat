@@ -4,7 +4,7 @@ module for logging historical values of possesions
 import datetime
 
 
-class InvestmentRecords(object):
+class RecordsLog(object):
     def __init__(self, location, include_date=True):
         self.location = location
         self.include_date = include_date

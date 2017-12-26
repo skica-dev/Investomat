@@ -10,29 +10,40 @@ import os
 import bitcoin
 import configure
 import gold
+import records
 
 try:
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'investomat.conf')) as data:
         settings = data.read().splitlines()
-        api_public = settings[0]
-        api_secret = settings[1]
-        address = settings[2]
-        amount = settings[3]
-        user = settings[4]
-        password = settings[5]
-        server = settings[6]
-        port = settings[7]
-        receipent = settings[8]
-        gold_possesions = settings[9:]
+        bitbay_api_public = settings[0]
+        bitbay_api_secret = settings[1]
+        bitfinex_api_public = settings[2]
+        bitfinex_api_secret = settings[3]
+        address = settings[4]
+        amount = settings[5]
+        user = settings[6]
+        password = settings[7]
+        server = settings[8]
+        port = settings[9]
+        receipent = settings[10]
+        gold_possesions = settings[11:]
 except (IOError, IndexError, TypeError):
     configure.make_config('investomat.conf')
     exit()
-bitbay = bitcoin.BitBayNet(api_public, api_secret)
-exchange_price = bitcoin.crypto_price()
+bitbay = bitcoin.BitBayNet(bitbay_api_public, bitbay_api_secret)
+bitfinex = bitcoin.Bitfinex(bitfinex_api_public, bitfinex_api_secret)
+bitbay_price = bitcoin.crypto_price()
 bitcoin_balance = bitcoin.get_address_balance(address)
-buy_data = bitbay.buy_crypto(
-    round(float(amount) / exchange_price, 8), exchange_price)
-exchange_user_info = bitbay.get_balances()
-print('BitBay:   {!s} PLN'.format(exchange_user_info['account_value']))
+buy_data = bitbay.buy_crypto(round(float(amount) / bitbay_price, 8), bitbay_price)
+bitbay_user_info = bitbay.get_balances()
+bitfinex_user_info = bitfinex.get_balances()
+bitcoin_value = round((bitbay_user_info['BTC'] + bitfinex_user_info['BTC'] + bitcoin_balance) * bitbay_price, 2)
+records_file = records.RecordsLog('investomat.data')
 gold_value = gold.gold_value(gold_possesions)
-print('Gold:     {!s} PLN'.format(gold_value))
+print('PLN:     {!s} PLN'.format(bitbay_user_info['PLN']))
+print('Gold:    {!s} PLN'.format(gold_value))
+print('Bitcoin: {!s} PLN'.format(bitcoin_value))
+print('-------> BitBay:   {!s} PLN'.format(round(bitbay_user_info['BTC'] * bitbay_price, 2)))
+print('-------> Bitfinex: {!s} PLN'.format(round(bitfinex_user_info['BTC'] * bitbay_price, 2)))
+print('\nΣ: {!s} PLN'.format(round(bitbay_user_info['PLN'] + gold_value + bitcoin_value, 2)))
+records_file.new_record(bitcoin_value, gold_value, bitbay_user_info['PLN'])
