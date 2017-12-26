@@ -10,7 +10,8 @@ def send_email(subject, receipent, content, login, password, server, port=587):
     """
     sending emails
     """
-    mail = 'From: %s\nSubject: %s\n%s' % (login, subject, content)
+    mail = 'From: {}\nSubject: {}\n\n{}'.format(login, subject, content)
+    print(mail)
     s = smtplib.SMTP(host=server, port=port)
     s.starttls()
     s.login(login, password)

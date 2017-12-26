@@ -10,6 +10,7 @@ import os
 import bitcoin
 import configure
 import gold
+import notify
 import records
 
 try:
@@ -40,10 +41,15 @@ bitfinex_user_info = bitfinex.get_balances()
 bitcoin_value = round((bitbay_user_info['BTC'] + bitfinex_user_info['BTC'] + bitcoin_balance) * bitbay_price, 2)
 records_file = records.RecordsLog('investomat.data')
 gold_value = gold.gold_value(gold_possesions)
-print('PLN:     {!s} PLN'.format(bitbay_user_info['PLN']))
-print('Gold:    {!s} PLN'.format(gold_value))
-print('Bitcoin: {!s} PLN'.format(bitcoin_value))
-print('-------> BitBay:   {!s} PLN'.format(round(bitbay_user_info['BTC'] * bitbay_price, 2)))
-print('-------> Bitfinex: {!s} PLN'.format(round(bitfinex_user_info['BTC'] * bitbay_price, 2)))
-print('\nΣ: {!s} PLN'.format(round(bitbay_user_info['PLN'] + gold_value + bitcoin_value, 2)))
+email = '''PLN:     {!s} PLN
+Gold:    {!s} PLN
+Bitcoin: {!s} PLN
+-------> BitBay:   {!s} PLN
+-------> Bitfinex: {!s} PLN
+TOTAL:   {!s} PLN'''.format(bitbay_user_info['PLN'], gold_value, bitcoin_value,
+                            round(bitbay_user_info['BTC'] * bitbay_price, 2),
+                            round(bitfinex_user_info['BTC'] * bitbay_price, 2),
+                            round(bitbay_user_info['PLN'] + gold_value + bitcoin_value, 2))
+print(email)
+notify.send_email('Raport Investomat', receipent, email, user, password, server)
 records_file.new_record(bitcoin_value, gold_value, bitbay_user_info['PLN'])
