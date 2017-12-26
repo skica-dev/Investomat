@@ -7,8 +7,10 @@ Bitcoin investments interactions:
 Supported exchanges:
 - BitBay.net
 """
+import base64
 import hashlib
 import hmac
+import json
 import time
 
 import requests
@@ -32,11 +34,11 @@ def crypto_price(mode='average', crypto='BTC'):
 
 
 class BitBayNet(object):
-    """class for BitBay.net bitbay"""
+    """class for BitBay.net"""
 
     def __init__(self, api_public, api_secret):
-        self.api_public = str(api_public)
-        self.api_secret = str(api_secret)
+        self.api_public = str(api_public).encode('utf-8')
+        self.api_secret = str(api_secret).encode('utf-8')
 
     def buy_crypto(self, amount, rate, crypto='BTC'):
         """
@@ -45,16 +47,16 @@ class BitBayNet(object):
         request = {'method': 'trade', 'moment': str(int(time.time())),
                    'type': 'buy', 'currency': crypto, 'amount': str(amount),
                    'payment_currency': 'PLN', 'rate': str(rate)}
-        sign = hmac.new(bytes(self.api_secret.encode('utf-8')),
+        sign = hmac.new(bytes(self.api_secret),
                         bytes("&".join([i + '=' + request[i] for i in request]).encode('utf-8')), hashlib.sha512)
         return requests.post(
-            "https://bitbay.net/API/Trading/tradingApi.php", request,
+            'https://bitbay.net/API/Trading/tradingApi.php', request,
             headers={'API-Key': self.api_public,
                      'API-Hash': sign.hexdigest()}).json()
 
     def get_balances(self):
         request = {'method': 'info', 'moment': str(int(time.time()))}
-        sign = hmac.new(bytes(self.api_secret.encode('utf-8')),
+        sign = hmac.new(bytes(self.api_secret),
                         bytes(('&'.join([i + '=' + request[i] for i in request])).encode('utf-8')), hashlib.sha512)
         balances = requests.post(
             'https://bitbay.net/API/Trading/tradingApi.php',
@@ -72,3 +74,36 @@ class BitBayNet(object):
                 account_value += formatted_balances[i] * crypto_price('ask', i)
         formatted_balances['account_value'] = round(account_value, 2)
         return formatted_balances
+
+
+class Bitfinex(object):
+    """class for bitfinex.com"""
+
+    def __init__(self, api_public, api_private):
+        self.api_public = api_public.encode('utf-8')
+        self.api_private = api_private.encode('utf-8')
+
+    def get_balances(self):  # see your balances.
+        payload = {
+            'request': '/v1/balances',
+            'nonce': str(time.time())
+        }
+        data = base64.b64encode(bytes(json.dumps(payload).encode('utf-8')))
+        signed_payload = {
+            'X-BFX-APIKEY': self.api_public,
+            'X-BFX-SIGNATURE': hmac.new(self.api_private, data, hashlib.sha384).hexdigest(),
+            'X-BFX-PAYLOAD': data
+        }
+        r = requests.post('https://api.bitfinex.com/v1/balances', headers=signed_payload, verify=True)
+        rep = r.json()
+        balances = {}
+        for i in range(len(rep)):
+            balances[rep[i]['currency'].upper()] = 0
+        for i in range(len(rep)):
+            balances[rep[i]['currency'].upper()] += float(rep[i]['amount'])
+        return balances
+
+
+if __name__ == '__main__':
+    a = Bitfinex('23MnFLsEg1DpMDWUvT6KRjXLHUCUAfNtb8Bss4ZBpD5', 'IeYURlhXSrvU4lQoskR6OCwfUNKZrUufJJOPw8WBF2c')
+    print(a.get_balances())
