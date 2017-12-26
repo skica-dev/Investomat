@@ -26,7 +26,7 @@ class RecordsLog(object):
 
     def read_records(self, *names):
         records = open(self.location, 'r').readlines()
-        record1, record2 = [], []
+        record1, record2, record3 = [], [], []
         if self.include_date:
             dates = []
         for i in records[:len(records)]:
@@ -34,7 +34,9 @@ class RecordsLog(object):
             if self.include_date:
                 dates.append(i[0])
             record1.append(i[1])
-            record2.append(i[2][:len(i[2]) - 1])
+            record2.append(i[2])
+            record3.append(i[3][:len(i[3]) - 1])
         return {'dates': dates,
                 names[0]: record1,
-                names[1]: record2}
+                names[1]: record2,
+                names[2]: record3}
