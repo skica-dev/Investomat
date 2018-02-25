@@ -8,7 +8,6 @@ Currently supports:
 import os
 
 import bitcoin
-import configure
 import gold
 import notify
 import records
@@ -29,7 +28,7 @@ try:
         recipient = settings[10]
         gold_possessions = settings[11:]
 except (IOError, IndexError, TypeError):
-    configure.make_config(os.path.join(os.pardir, 'investomat.conf'))
+    print("You don't have any config file!")
     exit()
 bitbay = bitcoin.BitBayNet(bitbay_api_public, bitbay_api_secret)
 bitfinex = bitcoin.Bitfinex(bitfinex_api_public, bitfinex_api_secret)
@@ -50,6 +49,5 @@ TOTAL:   {!s} PLN'''.format(bitbay_user_info['PLN'], gold_value, bitcoin_value,
                             round(bitbay_user_info['BTC'] * bitbay_price, 2),
                             round(bitfinex_user_info['BTC'] * bitbay_price, 2),
                             round(bitbay_user_info['PLN'] + gold_value + bitcoin_value, 2))
-print(email)
 notify.send_email('Investomat: Raport', recipient, email, user, password, server)
 records_file.new_record(bitcoin_value, gold_value, bitbay_user_info['PLN'])

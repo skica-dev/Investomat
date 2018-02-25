@@ -8,6 +8,7 @@ Supported exchanges:
 - BitBay.net
 """
 import base64
+import hashlib
 import hmac
 import json
 import time
