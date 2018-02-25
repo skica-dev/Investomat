@@ -8,7 +8,6 @@ Supported exchanges:
 - BitBay.net
 """
 import base64
-import hashlib
 import hmac
 import json
 import time
@@ -102,8 +101,3 @@ class Bitfinex(object):
         for i in range(len(rep)):
             balances[rep[i]['currency'].upper()] += float(rep[i]['amount'])
         return balances
-
-
-if __name__ == '__main__':
-    a = Bitfinex('23MnFLsEg1DpMDWUvT6KRjXLHUCUAfNtb8Bss4ZBpD5', 'IeYURlhXSrvU4lQoskR6OCwfUNKZrUufJJOPw8WBF2c')
-    print(a.get_balances())

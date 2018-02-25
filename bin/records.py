@@ -1,5 +1,5 @@
 """
-module for logging historical values of possesions
+module for logging historical values of possessions
 """
 import datetime
 
