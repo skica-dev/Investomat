@@ -5,7 +5,6 @@ Currently supports:
 - Bitcoin (exchanges listed in bitcoin.py)
 - gold (logging gold possessions and checking their values from zlotagotowka.pl
 """
-import os
 
 import bitcoin
 import gold
@@ -13,7 +12,7 @@ import notify
 import records
 
 try:
-    with open(os.path.join(os.pardir, 'investomat.conf')) as data:
+    with open('investomat.conf') as data:
         settings = data.read().splitlines()
         bitbay_api_public = settings[0]
         bitbay_api_secret = settings[1]
